@@ -1,10 +1,14 @@
-const express = require("express")
-const path = require("path")
-const logger = require("morgan")
-const bodyParser = require("body-parser")
-const hbsMiddleware = require("express-handlebars")
-const fs = require("fs")
-const _ = require("lodash")
+import express from "express"
+import path from "path"
+import { fileURLToPath } from 'url'
+import logger from "morgan"
+import bodyParser from "body-parser"
+import hbsMiddleware from "express-handlebars"
+import fs from "fs"
+import _ from "lodash"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 
@@ -65,8 +69,18 @@ app.post("/api/v1/questions", (req, res) => {
   }
 })
 
+app.get("/api/v1/launchers/:id", (req, res) =>{
+  let grab = JSON.parse(fs.readFileSync(path.join(__dirname, "../launchers.json")).toString())
+  let launcher = grab.find(person => person.id == req.params.id)
+  res.json(launcher)
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"))
+})
+
 app.listen(3000, "0.0.0.0", () => {
   console.log("Server is listening...")
 })
 
-module.exports = app
+export default app
